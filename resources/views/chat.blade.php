@@ -10,7 +10,7 @@
     <style>
         .list-group{
             overflow-y: scroll;
-            height: 500px;
+            height: 300px;
             border-left: black solid 1px;
         }
     </style>
@@ -24,6 +24,7 @@
                     <message-component
                     v-for="(value,index) in chat.message" :key="index"
                     color="success"
+                    :user='chat.user[index]'
                     >
                     @{{ value }}
                     </message-component>

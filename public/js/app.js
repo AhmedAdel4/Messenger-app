@@ -2109,7 +2109,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['color'],
+  props: ['color', 'user'],
   computed: {
     className: function className() {
       return 'list-group-item-' + this.color;
@@ -2117,10 +2117,10 @@ __webpack_require__.r(__webpack_exports__);
     badgeColor: function badgeColor() {
       return 'badge-' + this.color;
     }
-  },
-  mounted: function mounted() {
-    console.log('Component mounted.');
-  }
+  } // mounted() {
+  //     console.log('Component mounted.')
+  // }
+
 });
 
 /***/ }),
@@ -2150,16 +2150,33 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1__["default"]({
   data: {
     message: '',
     chat: {
-      message: []
+      message: [],
+      user: []
     }
   },
   methods: {
     send: function send() {
       if (this.message.length != 0) {
         this.chat.message.push(this.message);
+        this.chat.user.push('you');
+        var temp = this.message;
         this.message = '';
+        axios.post('/send', {
+          message: temp
+        }).then(function (response) {})["catch"](function (error) {
+          console.log(error);
+        });
       }
     }
+  },
+  mounted: function mounted() {
+    var _this = this;
+
+    Echo["private"]('chat').listen('ChatEvent', function (e) {
+      _this.chat.message.push(e.message);
+
+      _this.chat.user.push(e.user.name);
+    });
   }
 });
 
@@ -2206,7 +2223,7 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
-  key: "",
+  key: "288ed6c893a01b3da878",
   cluster: "mt1",
   forceTLS: true
 });
@@ -44060,7 +44077,7 @@ var render = function() {
     ),
     _vm._v(" "),
     _c("small", { staticClass: "badge float-right", class: _vm.badgeColor }, [
-      _vm._v("you")
+      _vm._v(_vm._s(_vm.user))
     ])
   ])
 }
