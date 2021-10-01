@@ -17,29 +17,45 @@ const app = new Vue({
         message: '',
         chat: {
             message: [],
-            user:[],
-        }
+            user: [],
+            color: [],
+            date: '',
+        },
+        typing: '',
+        numOfUsers: 0
     },
     methods: {
         send() {
             if (this.message.length != 0) {
                 this.chat.message.push(this.message);
                 this.chat.user.push('you');
+                this.chat.color.push('success');
                 var temp = this.message;
                 this.message = '';
+                var today = new Date();
+                var time = today.getHours() + ":" + today.getMinutes();
+                this.chat.date = time;
                 axios.post('/send', {
                     message: temp
                 })
                     .then(response => {
-                        
-    
+
                     })
                     .catch(error => {
                         console.log(error);
                     });
 
+
             }
-            
+
+        }
+    },
+    watch: {
+        message() {
+            Echo.private('chat')
+                .whisper('typing', {
+                    message: this.message
+                });
         }
     },
     mounted() {
@@ -47,6 +63,33 @@ const app = new Vue({
             .listen('ChatEvent', (e) => {
                 this.chat.message.push(e.message);
                 this.chat.user.push(e.user.name);
+                this.chat.color.push('dark');
+                var today = new Date();
+                var time = today.getHours() + ":" + today.getMinutes();
+                this.chat.date = time;
+            })
+            .listenForWhisper('typing', (e) => {
+                if (e.message != '') {
+                    this.typing = 'Typing...'
+                }
+                else {
+                    this.typing = '';
+                }
             });
+        Echo.join('chat')
+            .here((users) => {
+                this.numOfUsers = users.length;
+            })
+            .joining((user) => {
+                this.numOfUsers++;
+
+            })
+            .leaving((user) => {
+                this.numOfUsers--;
+            })
+            .error((error) => {
+                console.error(error);
+            });
+
     }
 });

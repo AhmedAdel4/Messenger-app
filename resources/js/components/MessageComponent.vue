@@ -1,7 +1,8 @@
 <template>
     <div>
         <li class="list-group-item" :class="className"><slot></slot></li>
-        <small class="badge float-right" :class="badgeColor">{{user}}</small>
+        <small class="badge"  :class="badgeColor">{{user}}</small>
+        <small class="badge"  :class="badgeColor">{{ date}}</small>
     </div>
 
 </template>
@@ -10,15 +11,25 @@
     export default {
         props:[
             'color',
-            'user'
+            'user',
+            'date'
         ],
         computed:{
             className(){
                 return 'list-group-item-'+ this.color;
             },
             badgeColor(){
-                return 'badge-'+ this.color;
-            }
+                let name = '';
+                name += 'badge-'+ this.color
+                if(this.user == 'you')
+                {
+                    name += ' float-left';
+                }else{
+                     name += ' float-right';
+                }
+                return name;
+            },
+         
         },
         // mounted() {
         //     console.log('Component mounted.')

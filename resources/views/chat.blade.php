@@ -11,7 +11,7 @@
         .list-group{
             overflow-y: scroll;
             height: 300px;
-            border-left: black solid 1px;
+            
         }
     </style>
 </head>
@@ -19,12 +19,15 @@
     <div class="container">
         <div class="row" id="app">
             <div class="offset-2 col-8 mt-4">
+                <li class="list-group-item active">Chat Room <span class="badge badge-pill badge-success">
+                    @{{ numOfUsers }}</span></li>
+                <div class="badge badge-pill badge-primary">@{{ typing }}</div>
                 <ul class="list-group" v-chat-scroll>
-                    <li class="list-group-item active">Chat Room</li>
                     <message-component
                     v-for="(value,index) in chat.message" :key="index"
-                    color="success"
+                    :color="chat.color[index]"
                     :user='chat.user[index]'
+                    :date='chat.date'
                     >
                     @{{ value }}
                     </message-component>

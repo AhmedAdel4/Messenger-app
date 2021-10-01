@@ -2108,14 +2108,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['color', 'user'],
+  props: ['color', 'user', 'date'],
   computed: {
     className: function className() {
       return 'list-group-item-' + this.color;
     },
     badgeColor: function badgeColor() {
-      return 'badge-' + this.color;
+      var name = '';
+      name += 'badge-' + this.color;
+
+      if (this.user == 'you') {
+        name += ' float-left';
+      } else {
+        name += ' float-right';
+      }
+
+      return name;
     }
   } // mounted() {
   //     console.log('Component mounted.')
@@ -2151,22 +2161,37 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1__["default"]({
     message: '',
     chat: {
       message: [],
-      user: []
-    }
+      user: [],
+      color: [],
+      date: ''
+    },
+    typing: '',
+    numOfUsers: 0
   },
   methods: {
     send: function send() {
       if (this.message.length != 0) {
         this.chat.message.push(this.message);
         this.chat.user.push('you');
+        this.chat.color.push('success');
         var temp = this.message;
         this.message = '';
+        var today = new Date();
+        var time = today.getHours() + ":" + today.getMinutes();
+        this.chat.date = time;
         axios.post('/send', {
           message: temp
         }).then(function (response) {})["catch"](function (error) {
           console.log(error);
         });
       }
+    }
+  },
+  watch: {
+    message: function message() {
+      Echo["private"]('chat').whisper('typing', {
+        message: this.message
+      });
     }
   },
   mounted: function mounted() {
@@ -2176,6 +2201,27 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1__["default"]({
       _this.chat.message.push(e.message);
 
       _this.chat.user.push(e.user.name);
+
+      _this.chat.color.push('dark');
+
+      var today = new Date();
+      var time = today.getHours() + ":" + today.getMinutes();
+      _this.chat.date = time;
+    }).listenForWhisper('typing', function (e) {
+      if (e.message != '') {
+        _this.typing = 'Typing...';
+      } else {
+        _this.typing = '';
+      }
+    });
+    Echo.join('chat').here(function (users) {
+      _this.numOfUsers = users.length;
+    }).joining(function (user) {
+      _this.numOfUsers++;
+    }).leaving(function (user) {
+      _this.numOfUsers--;
+    }).error(function (error) {
+      console.error(error);
     });
   }
 });
@@ -44076,8 +44122,12 @@ var render = function() {
       2
     ),
     _vm._v(" "),
-    _c("small", { staticClass: "badge float-right", class: _vm.badgeColor }, [
+    _c("small", { staticClass: "badge", class: _vm.badgeColor }, [
       _vm._v(_vm._s(_vm.user))
+    ]),
+    _vm._v(" "),
+    _c("small", { staticClass: "badge", class: _vm.badgeColor }, [
+      _vm._v(_vm._s(_vm.date))
     ])
   ])
 }

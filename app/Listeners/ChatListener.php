@@ -24,7 +24,7 @@ class ChatListener
      * @param  object  $event
      * @return void
      */
-    public function handle(ChatEvent $event)
+    public function handle()
     {
         //
     }
